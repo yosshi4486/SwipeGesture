@@ -146,7 +146,6 @@ struct SwipeGesture<Content> : UIViewControllerRepresentable where Content : Vie
     }
 }
 
-// Althogh library items are registered, Details are not previewed.
 @available (iOS 14, *)
 public struct SwipeGesture_Library<ContentView : View> : LibraryContentProvider {
 
