@@ -2,8 +2,15 @@ import SwiftUI
 
 extension View {
     
-    public func onSwipe(leftAction: @escaping () -> Void = {}, rightAction: @escaping () -> Void = {}) -> some View {
-        SwipeGesture(content: self, onSwipeLeft: leftAction, onSwipeRight: rightAction)
+    public func onSwipe(leftAction: (() -> Void)?,
+                        rightAction: (() -> Void)?,
+                        upAction: (() -> Void)?,
+                        downAction: (() -> Void)?) -> some View {
+        SwipeGesture(content: self,
+                     onSwipeLeft: leftAction,
+                     onSwipeRight: rightAction,
+                     onSwipeUp: upAction,
+                     onSwipeDown: downAction)
     }
     
 }
@@ -11,21 +18,38 @@ extension View {
 struct SwipeGesture<Content> : UIViewControllerRepresentable where Content : View {
     
     var content: Content
-    var onSwipeLeft: () -> Void
-    var onSwipeRight: () -> Void
-    
+    var onSwipeLeft: (() -> Void)?
+    var onSwipeRight: (() -> Void)?
+    var onSwipeUp: (() -> Void)?
+    var onSwipeDown: (() -> Void)?
+
     func makeUIViewController(context: Context) -> UIHostingController<Content> {
         let hostingController = UIHostingController(rootView: content)
         hostingController.view.backgroundColor = .clear
         
-        let left = UISwipeGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.swipeRightToLeft))
-        left.direction = .left
+        if onSwipeLeft != nil {
+            let left = UISwipeGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.swipeLeft))
+            left.direction = .left
+            hostingController.view.addGestureRecognizer(left)
+        }
+
+        if onSwipeRight != nil {
+            let right = UISwipeGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.swipeight))
+            right.direction = .right
+            hostingController.view.addGestureRecognizer(right)
+        }
+
+        if onSwipeUp != nil {
+            let up = UISwipeGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.swipeUp))
+            up.direction = .up
+            hostingController.view.addGestureRecognizer(up)
+        }
         
-        let right = UISwipeGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.swipeLeftToRight))
-        right.direction = .right
-        
-        hostingController.view.addGestureRecognizer(left)
-        hostingController.view.addGestureRecognizer(right)
+        if onSwipeDown != nil {
+            let down = UISwipeGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.swipeDown))
+            down.direction = .down
+            hostingController.view.addGestureRecognizer(down)
+        }
         
         return hostingController
     }
@@ -35,24 +59,42 @@ struct SwipeGesture<Content> : UIViewControllerRepresentable where Content : Vie
     }
         
     func makeCoordinator() -> Coordinator {
-        Coordinator(onSwipeLeft: self.onSwipeLeft, onSwipeRight: self.onSwipeRight)
+        Coordinator(onSwipeLeft: self.onSwipeLeft,
+                    onSwipeRight: self.onSwipeRight,
+                    onSwipeUp: self.onSwipeUp,
+                    onSwipeDown: self.onSwipeDown)
     }
     
     class Coordinator : NSObject {
-        var onSwipeLeft: () -> Void
-        var onSwipeRight: () -> Void
-        
-        init(onSwipeLeft: @escaping () -> Void, onSwipeRight: @escaping () -> Void) {
+        var onSwipeLeft: (() -> Void)?
+        var onSwipeRight: (() -> Void)?
+        var onSwipeUp: (() -> Void)?
+        var onSwipeDown: (() -> Void)?
+
+        init(onSwipeLeft: (() -> Void)?,
+             onSwipeRight: (() -> Void)?,
+             onSwipeUp: (() -> Void)?,
+             onSwipeDown: (() -> Void)?) {
             self.onSwipeLeft = onSwipeLeft
             self.onSwipeRight = onSwipeRight
+            self.onSwipeUp = onSwipeUp
+            self.onSwipeDown = onSwipeDown
         }
 
-        @objc func swipeRightToLeft() {
-            onSwipeLeft()
+        @objc func swipeLeft() {
+            onSwipeLeft?()
         }
         
-        @objc func swipeLeftToRight() {
-            onSwipeRight()
+        @objc func swipeight() {
+            onSwipeRight?()
+        }
+        
+        @objc func swipeUp() {
+            onSwipeUp?()
+        }
+        
+        @objc func swipeDown() {
+            onSwipeDown?()
         }
         
     }
