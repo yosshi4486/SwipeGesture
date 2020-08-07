@@ -2,7 +2,7 @@ import SwiftUI
 
 extension View {
     
-    func onSwipe(leftAction: @escaping () -> Void = {}, rightAction: @escaping () -> Void = {}) -> some View {
+    public func onSwipe(leftAction: @escaping () -> Void = {}, rightAction: @escaping () -> Void = {}) -> some View {
         SwipeGesture(content: self, onSwipeLeft: leftAction, onSwipeRight: rightAction)
     }
     
