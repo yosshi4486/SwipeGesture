@@ -2,7 +2,7 @@
 
 ## Usage
 ### Multi Direction APIs
-```
+```swift
 YourView()
     .onSwipe(leftAction: {
         // do something in left swipe
@@ -16,7 +16,7 @@ YourView()
 ```
 
 ### Single Direction APIs
-```
+```swift
 YourView()
     .onSwipeLeft {
         // do something in left swipe
