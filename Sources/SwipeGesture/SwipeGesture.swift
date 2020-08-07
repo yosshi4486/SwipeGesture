@@ -2,10 +2,11 @@ import SwiftUI
 
 extension View {
     
-    public func onSwipe(leftAction: (() -> Void)?,
-                        rightAction: (() -> Void)?,
-                        upAction: (() -> Void)?,
-                        downAction: (() -> Void)?) -> some View {
+    /// A modifier notifying swipe events.
+    public func onSwipe(leftAction: (() -> Void)? = nil,
+                        rightAction: (() -> Void)? = nil,
+                        upAction: (() -> Void)? = nil,
+                        downAction: (() -> Void)? = nil) -> some View {
         SwipeGesture(content: self,
                      onSwipeLeft: leftAction,
                      onSwipeRight: rightAction,
@@ -13,6 +14,50 @@ extension View {
                      onSwipeDown: downAction)
     }
     
+    /// A modifier notifying left swipe events.
+    ///
+    /// - Attention: Since the modifier wrap content by UIHostingViewController, you might wrap the content excessively if you use convenience APIs. I recommend to use general API for adopting multi direction.
+    public func onSwipeLeft(perform action: @escaping () -> Void) -> some View {
+        SwipeGesture(content: self,
+                     onSwipeLeft: action,
+                     onSwipeRight: nil,
+                     onSwipeUp: nil,
+                     onSwipeDown: nil)
+    }
+    
+    /// A modifier notifying right swipe events.
+    ///
+    /// - Attention: Since the modifier wrap content by UIHostingViewController, you might wrap the content excessively if you use convenience APIs. I recommend to use general API for adopting multi direction
+    public func onSwipeRight(perform action: @escaping () -> Void) -> some View {
+        SwipeGesture(content: self,
+                     onSwipeLeft: nil,
+                     onSwipeRight: action,
+                     onSwipeUp: nil,
+                     onSwipeDown: nil)
+    }
+    
+    /// A modifier notifying up swipe events.
+    ///
+    /// - Attention: Since the modifier wrap content by UIHostingViewController, you might wrap the content excessively if you use convenience APIs. I recommend to use general API for adopting multi direction
+    public func onSwipeUp(perform action: @escaping () -> Void) -> some View {
+        SwipeGesture(content: self,
+                     onSwipeLeft: nil,
+                     onSwipeRight: nil,
+                     onSwipeUp: action,
+                     onSwipeDown: nil)
+    }
+
+    /// A modifier notifying down swipe events.
+    ///
+    /// - Attention: Since the modifier wrap content by UIHostingViewController, you might wrap the content excessively if you use convenience APIs. I recommend to use general API for adopting multi direction
+    public func onSwipeDown(perform action: @escaping () -> Void) -> some View {
+        SwipeGesture(content: self,
+                     onSwipeLeft: nil,
+                     onSwipeRight: nil,
+                     onSwipeUp: nil,
+                     onSwipeDown: action)
+    }
+
 }
 
 struct SwipeGesture<Content> : UIViewControllerRepresentable where Content : View {
@@ -27,6 +72,7 @@ struct SwipeGesture<Content> : UIViewControllerRepresentable where Content : Vie
         let hostingController = UIHostingController(rootView: content)
         hostingController.view.backgroundColor = .clear
         
+        // Checking nullabilities for safety. As SwiftUI is still buggy, safety is worth.
         if onSwipeLeft != nil {
             let left = UISwipeGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.swipeLeft))
             left.direction = .left
@@ -98,4 +144,40 @@ struct SwipeGesture<Content> : UIViewControllerRepresentable where Content : Vie
         }
         
     }
+}
+
+// Althogh library items are registered, Details are not previewed.
+@available (iOS 14, *)
+public struct SwipeGesture_Library<ContentView : View> : LibraryContentProvider {
+
+    @LibraryContentBuilder
+    public func modifiers(base: ContentView) -> [LibraryItem] {
+        LibraryItem(base.onSwipeLeft(perform: {
+            
+        }))
+        
+        LibraryItem(base.onSwipeRight(perform: {
+            
+        }))
+        
+        LibraryItem(base.onSwipeUp(perform: {
+            
+        }))
+
+        LibraryItem(base.onSwipeDown(perform: {
+            
+        }))
+        
+        LibraryItem(base.onSwipe(leftAction: {
+            
+        }, rightAction: {
+            
+        }, upAction: {
+            
+        }, downAction: {
+            
+        }))
+
+    }
+    
 }
